@@ -9,6 +9,31 @@ class IndecisionApp extends React.Component{
         this.handleAddOption = this.handleAddOption.bind(this);
         this.handleDeleteOption = this.handleDeleteOption.bind(this);
     }
+
+    componentDidMount(){
+        try{
+            // console.log('fetching data'); //gets called when componet renders first time
+            const json = localStorage.getItem('options');
+            const options = JSON.parse(json);
+            if(options){
+                this.setState(() => ({ options}))
+            }
+        }catch(e){
+            //do nothing
+        }
+        
+    }
+    componentDidUpdate(prevProps, prevState){
+        if(prevState.options.length !== this.state.options.length){
+            const json = JSON.stringify(this.state.options);
+            localStorage.setItem('options',json);
+            console.log('saving data'); //gets called when componet updates e.g state or prop
+        }
+        
+    }
+    componetWillUnmount(){
+        console.log('componentWillUnmount');
+    }
     //handle delete option
     handleDeleteOptions(){
         // this.setState(() =>{
@@ -115,6 +140,9 @@ const Action = (props) => {
 const Options =(props) => {
     return(
         <div>
+            {
+                props.options.length === 0 && <p>Please Add an option to get started</p>
+            }
             <button onClick={props.handleDeleteOptions}>Remove All</button>
             {
                 props.options.map((option) => (
@@ -177,7 +205,6 @@ class AddOption extends React.Component{
     handleAddoption(e){
         e.preventDefault();
         const option = e.target.elements.option.value.trim();
-        e.target.elements.option.value ="";
         const error = this.props.handleAddOption(option);
         
         // this.setState(()=>{
@@ -186,6 +213,9 @@ class AddOption extends React.Component{
         //     }
         // })
         this.setState(() => ({ error }))
+        if(!error){
+            e.target.elements.option.value ="";
+        }
     }
     render(){
         return(

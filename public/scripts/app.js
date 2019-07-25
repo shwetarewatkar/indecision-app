@@ -25,10 +25,40 @@ var IndecisionApp = function (_React$Component) {
         _this.handleDeleteOption = _this.handleDeleteOption.bind(_this);
         return _this;
     }
-    //handle delete option
-
 
     _createClass(IndecisionApp, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            try {
+                // console.log('fetching data'); //gets called when componet renders first time
+                var json = localStorage.getItem('options');
+                var options = JSON.parse(json);
+                if (options) {
+                    this.setState(function () {
+                        return { options: options };
+                    });
+                }
+            } catch (e) {
+                //do nothing
+            }
+        }
+    }, {
+        key: 'componentDidUpdate',
+        value: function componentDidUpdate(prevProps, prevState) {
+            if (prevState.options.length !== this.state.options.length) {
+                var json = JSON.stringify(this.state.options);
+                localStorage.setItem('options', json);
+                console.log('saving data'); //gets called when componet updates e.g state or prop
+            }
+        }
+    }, {
+        key: 'componetWillUnmount',
+        value: function componetWillUnmount() {
+            console.log('componentWillUnmount');
+        }
+        //handle delete option
+
+    }, {
         key: 'handleDeleteOptions',
         value: function handleDeleteOptions() {
             // this.setState(() =>{
@@ -162,6 +192,11 @@ var Options = function Options(props) {
     return React.createElement(
         'div',
         null,
+        props.options.length === 0 && React.createElement(
+            'p',
+            null,
+            'Please Add an option to get started'
+        ),
         React.createElement(
             'button',
             { onClick: props.handleDeleteOptions },
@@ -242,7 +277,6 @@ var AddOption = function (_React$Component2) {
         value: function handleAddoption(e) {
             e.preventDefault();
             var option = e.target.elements.option.value.trim();
-            e.target.elements.option.value = "";
             var error = this.props.handleAddOption(option);
 
             // this.setState(()=>{
@@ -253,6 +287,9 @@ var AddOption = function (_React$Component2) {
             this.setState(function () {
                 return { error: error };
             });
+            if (!error) {
+                e.target.elements.option.value = "";
+            }
         }
     }, {
         key: 'render',
